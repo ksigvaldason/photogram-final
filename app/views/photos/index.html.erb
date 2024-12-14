@@ -1,0 +1,12 @@
+<h1>Welcome to Photogram</h1>
+
+<% if @photos&.any? %>
+  <% @photos.each do |photo| %>
+    <div>
+      <img src="<%= photo.image %>" alt="<%= photo.caption %>">
+      <p><%= photo.caption %></p>
+    </div>
+  <% end %>
+<% else %>
+  <p>No photos available yet.</p>
+<% end %>
