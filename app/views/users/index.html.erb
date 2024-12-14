@@ -17,13 +17,13 @@
           <% if follow_request.nil? %>
             <%= form_with(url: follow_requests_path, method: :post) do |f| %>
               <%= f.hidden_field :recipient_id, value: user.id %>
-              <%= f.submit "Follow" %>
+              <%= f.button "Follow" %>
             <% end %>
           <% elsif follow_request.status == "pending" %>
-            <span>Request sent</span>
-            <%= form_with(url: follow_request_path(follow_request), method: :delete) do |f| %>
-              <%= f.submit "Cancel" %>
-            <% end %>
+            <div>
+              <span>Request sent</span>
+              <%= link_to "Cancel", follow_request_path(follow_request), method: :delete %>
+            </div>
           <% elsif follow_request.status == "accepted" %>
             <%= link_to "Unfollow", follow_request_path(follow_request), method: :delete %>
           <% end %>

@@ -13,6 +13,9 @@ class UsersController < ApplicationController
   def feed
     @user = User.find_by!(username: params[:id])
     following_ids = @user.sent_follow_requests.where(status: "accepted").pluck(:recipient_id)
-    @feed_photos = Photo.where(owner_id: following_ids).order(created_at: :desc)
+    @feed_photos = Photo.includes(:owner, :likes)
+                       .where(owner_id: following_ids)
+                       .order(created_at: :desc)
   end
+  
 end

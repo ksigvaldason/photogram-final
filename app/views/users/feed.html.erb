@@ -10,16 +10,18 @@
     <th></th>
   </tr>
   
-  <% @feed_photos.each do |photo| %>
-    <tr>
-      <td>
-        <img src="https://robohash.org/<%= photo.image %>" class="img-responsive">
-      </td>
-      <td><%= photo.owner.username %></td>
-      <td><%= photo.caption %></td>
-      <td><%= time_ago_in_words(photo.created_at) %> ago</td>
-      <td><%= photo.likes.count %></td>
-      <td><%= link_to "Show details", photo_path(photo) %></td>
-    </tr>
+  <% if @feed_photos.present? %>
+    <% @feed_photos.each do |photo| %>
+      <tr>
+        <td>
+          <img src="<%= photo.image %>" class="img-responsive">
+        </td>
+        <td><%= photo.owner.username %></td>
+        <td><%= photo.caption %></td>
+        <td><%= time_ago_in_words(photo.created_at) %> ago</td>
+        <td><%= photo.likes_count || photo.likes.count %></td>
+        <td><%= link_to "Show details", photo_path(photo) %></td>
+      </tr>
+    <% end %>
   <% end %>
 </table>
