@@ -17,4 +17,7 @@ class Photo < ApplicationRecord
   has_many :likes
   has_many :fans, through: :likes
   
+  def image_identifier
+    image.split('/').last if image
+  end
 end

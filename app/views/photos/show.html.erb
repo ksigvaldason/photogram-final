@@ -3,7 +3,7 @@
 <dl>
   <dt>Image</dt>
   <dd>
-    <img src="https://robohash.org/<%= @photo.image.split('/').last if @photo.image %>">
+    <img src="https://robohash.org/<%= @photo.image %>">
   </dd>
 
   <dt>Caption</dt>
@@ -41,22 +41,24 @@
 </dl>
 
 <% if user_signed_in? && current_user == @photo.owner %>
-  <%= link_to "Delete this photo", photo_path(@photo), method: :delete, data: { confirm: "Are you sure?" } %>
+  <%= link_to "Delete this photo", photo_path(@photo), method: :delete %>
   
-  <h3>Update photo</h3>
-  <%= form_with(model: @photo, local: true) do |form| %>
-    <div>
-      <%= form.label :caption %>
-      <%= form.text_field :caption %>
-    </div>
-    
-    <div>
-      <%= form.label :image %>
-      <%= form.text_field :image %>
-    </div>
-    
-    <%= form.submit "Update photo" %>
-  <% end %>
+  <div class="update-form">
+    <h3>Update photo</h3>
+    <%= form_with(model: @photo, local: true) do |form| %>
+      <div>
+        <%= form.label :caption %>
+        <%= form.text_field :caption %>
+      </div>
+      
+      <div>
+        <%= form.label :image %>
+        <%= form.text_field :image %>
+      </div>
+      
+      <%= form.submit "Update photo" %>
+    <% end %>
+  </div>
 <% end %>
 
 <h2>Comments</h2>
@@ -79,7 +81,7 @@
 
 <% if user_signed_in? %>
   <h3>Add a new comment</h3>
-  <%= form_with(url: photo_comments_path(@photo), method: :post) do |form| %>
+  <%= form_with(url: photo_comments_path(@photo), method: :post, local: true) do |form| %>
     <%= form.hidden_field :photo_id, value: @photo.id %>
     
     <div>
@@ -87,6 +89,6 @@
       <%= form.text_area :body, placeholder: "Enter a comment..." %>
     </div>
     
-    <%= form.button "Add comment" %>
+    <%= form.submit "Add comment" %>
   <% end %>
 <% end %>
