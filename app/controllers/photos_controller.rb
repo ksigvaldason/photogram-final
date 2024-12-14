@@ -11,12 +11,12 @@ class PhotosController < ApplicationController
     @photo.likes_count = 0
     
     if @photo.save
-      redirect_to photos_path, notice: "Photo added successfully!"
+      redirect_to photos_path, notice: "Photo created successfully"
     else
       @photos = Photo.joins(:owner).where(users: { private: [false, nil] })
       render :index
     end
-  end
+  end  
 
   def show
     @photo = Photo.find(params[:id])
