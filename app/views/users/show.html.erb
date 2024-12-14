@@ -9,17 +9,28 @@
   <dd><%= @user.following&.count || 0 %></dd>
 </dl>
 
-<% if @user.private? && @pending_requests.any? %>
-  <h4>Pending follow requests</h4>
-  <ul>
-    <% @pending_requests.each do |request| %>
-      <li>
-        <%= request.sender.username %>
-        <%= button_to "Accept", modify_follow_request_path(request, query_status: "accepted"), method: :post %>
-        <%= button_to "Reject", modify_follow_request_path(request, query_status: "rejected"), method: :post %>
-      </li>
-    <% end %>
-  </ul>
+<% if user_signed_in? && current_user != @user %>
+  <% if !current_user.sent_follow_requests.exists?(recipient: @user) %>
+    <%= button_to "Follow", follow_requests_path(recipient_id: @user.id), method: :post %>
+  <% elsif current_user.sent_follow_requests.exists?(recipient: @user, status: "accepted") %>
+    <%= button_to "Unfollow", follow_request_path(current_user.sent_follow_requests.find_by(recipient: @user)), method: :delete %>
+  <% end %>
+<% end %>
+
+<% if @user == current_user && @user.private? %>
+  <% @pending_requests = @user.received_follow_requests.where(status: "pending") %>
+  <% if @pending_requests.any? %>
+    <h4>Pending follow requests</h4>
+    <ul>
+      <% @pending_requests.each do |request| %>
+        <li>
+          <%= request.sender.username %>
+          <%= button_to "Accept", modify_follow_request_path(request, query_status: "accepted"), method: :post %>
+          <%= button_to "Reject", modify_follow_request_path(request, query_status: "rejected"), method: :post %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
 <% end %>
 
 <nav>
@@ -44,7 +55,7 @@
   </tr>
   <% @user.photos.each do |photo| %>
     <tr>
-      <td><img src="<%= photo.image %>" class="img-responsive"></td>
+      <td><img src="<%= photo.image %>" class="img-responsive" alt="<%= photo.caption %>"></td>
       <td><%= @user.username %></td>
       <td><%= photo.caption %></td>
       <td><%= time_ago_in_words(photo.created_at) %> ago</td>
