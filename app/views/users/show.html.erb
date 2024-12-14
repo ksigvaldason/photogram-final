@@ -2,7 +2,7 @@
 
 <dl>
   <dt>Private</dt>
-  <dd><%= @user.private ? "Yes" : "No" %></dd>
+  <dd><%= @user.private?.to_s %></dd>
   <dt>Followers</dt>
   <dd><%= @user.followers&.count || 0 %></dd>
   <dt>Following</dt>
@@ -10,27 +10,28 @@
 </dl>
 
 <% if user_signed_in? && current_user != @user %>
-  <% if !current_user.sent_follow_requests.exists?(recipient: @user) %>
+  <% follow_request = current_user.sent_follow_requests.find_by(recipient: @user) %>
+  <% if follow_request.nil? %>
     <%= button_to "Follow", follow_requests_path(recipient_id: @user.id), method: :post %>
-  <% elsif current_user.sent_follow_requests.exists?(recipient: @user, status: "accepted") %>
-    <%= button_to "Unfollow", follow_request_path(current_user.sent_follow_requests.find_by(recipient: @user)), method: :delete %>
+  <% elsif follow_request.status == "accepted" %>
+    <%= link_to "Unfollow", follow_request_path(follow_request), method: :delete %>
+  <% elsif follow_request.status == "pending" %>
+    <span>Request sent</span>
+    <%= button_to "Cancel", follow_request_path(follow_request), method: :delete %>
   <% end %>
 <% end %>
 
-<% if @user == current_user && @user.private? %>
-  <% @pending_requests = @user.received_follow_requests.where(status: "pending") %>
-  <% if @pending_requests.any? %>
-    <h4>Pending follow requests</h4>
-    <ul>
-      <% @pending_requests.each do |request| %>
-        <li>
-          <%= request.sender.username %>
-          <%= button_to "Accept", modify_follow_request_path(request, query_status: "accepted"), method: :post %>
-          <%= button_to "Reject", modify_follow_request_path(request, query_status: "rejected"), method: :post %>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
+<% if @user == current_user && @pending_requests&.any? %>
+  <h4>Pending follow requests</h4>
+  <ul>
+    <% @pending_requests.each do |request| %>
+      <li>
+        <%= request.sender.username %>
+        <%= button_to "Accept", modify_follow_request_path(request, query_status: "accepted"), method: :post %>
+        <%= button_to "Reject", modify_follow_request_path(request, query_status: "rejected"), method: :post %>
+      </li>
+    <% end %>
+  </ul>
 <% end %>
 
 <nav>

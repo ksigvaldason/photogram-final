@@ -1,11 +1,25 @@
 <h1><%= @user.username %>'s Feed</h1>
 
-<div class="photos">
+<table border="1">
+  <tr>
+    <th>Image</th>
+    <th>Owner</th>
+    <th>Caption</th>
+    <th>Posted</th>
+    <th>Likes</th>
+    <th></th>
+  </tr>
+  
   <% @feed_photos.each do |photo| %>
-    <div class="photo">
-      <img src="<%= photo.image %>" alt="<%= photo.caption %>">
-      <p><%= photo.caption %></p>
-      <p>Posted by: <%= photo.owner.username %></p>
-    </div>
+    <tr>
+      <td>
+        <img src="https://robohash.org/<%= photo.image %>" class="img-responsive">
+      </td>
+      <td><%= photo.owner.username %></td>
+      <td><%= photo.caption %></td>
+      <td><%= time_ago_in_words(photo.created_at) %> ago</td>
+      <td><%= photo.likes.count %></td>
+      <td><%= link_to "Show details", photo_path(photo) %></td>
+    </tr>
   <% end %>
-</div>
+</table>
