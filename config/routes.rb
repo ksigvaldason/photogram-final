@@ -11,7 +11,8 @@ Rails.application.routes.draw do
   end
   resources :photos do
     resources :likes, only: [:create, :destroy]
+    resources :comments, only: [:create] # Add this line
   end
-  resources :comments
+  resources :comments, only: [:destroy]
   resources :follow_requests, only: [:create, :destroy]
 end

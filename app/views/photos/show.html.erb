@@ -1,0 +1,89 @@
+<h1>Photo Details</h1>
+
+<dl>
+  <dt>Image</dt>
+  <dd>
+    <img src="https://robohash.org/<%= @photo.image %>">
+  </dd>
+
+  <dt>Caption</dt>
+  <dd><%= @photo.caption %></dd>
+
+  <dt>Owner</dt>
+  <dd><%= @photo.owner.username %></dd>
+
+  <dt>Posted</dt>
+  <dd><%= time_ago_in_words(@photo.created_at) %> ago</dd>
+
+  <dt>Likes count</dt>
+  <dd><%= @photo.likes.count %></dd>
+
+  <dt>Comments count</dt>
+  <dd><%= @photo.comments.count %></dd>
+
+  <dt>Fans</dt>
+  <dd>
+    <%= @photo.fans.pluck(:username).to_sentence %>
+  </dd>
+
+  <dt>Add a fan</dt>
+  <dd>
+    <% if user_signed_in? %>
+      <% if current_user.likes.exists?(photo: @photo) %>
+        <%= button_to "Unlike", photo_like_path(@photo, current_user.likes.find_by(photo: @photo)), method: :delete %>
+      <% else %>
+        <%= button_to "Like", photo_likes_path(@photo), method: :post %>
+      <% end %>
+    <% end %>
+  </dd>
+</dl>
+
+<% if user_signed_in? && current_user == @photo.owner %>
+  <div>
+    <%= button_to "Delete this photo", photo_path(@photo), method: :delete %>
+    
+    <h3>Update photo</h3>
+    <%= form_with(model: @photo, local: true) do |form| %>
+      <div>
+        <%= form.label :caption %>
+        <%= form.text_field :caption %>
+      </div>
+      
+      <div>
+        <%= form.label :image %>
+        <%= form.text_field :image %>
+      </div>
+      
+      <%= form.submit "Update photo" %>
+    <% end %>
+  </div>
+<% end %>
+
+<h2>Comments</h2>
+
+<table>
+  <tr>
+    <th>Commenter</th>
+    <th>Comment</th>
+    <th>Posted</th>
+  </tr>
+
+  <% @photo.comments.each do |comment| %>
+    <tr>
+      <td><%= comment.author.username %></td>
+      <td><%= comment.body %></td>
+      <td><%= time_ago_in_words(comment.created_at) %> ago</td>
+    </tr>
+  <% end %>
+</table>
+
+<% if user_signed_in? %>
+  <h3>Add a new comment</h3>
+  <%= form_with(model: [@photo, Comment.new], local: true) do |form| %>
+    <%= form.label :body, "Comment" %>
+    <%= form.text_area :body, placeholder: "Enter a comment..." %>
+    
+    <%= form.submit "Add comment" %>
+  <% end %>
+<% end %>
+

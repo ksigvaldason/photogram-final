@@ -18,6 +18,11 @@ class PhotosController < ApplicationController
     end
   end
 
+  def show
+    @photo = Photo.find(params[:id])
+    @comment = Comment.new
+  end
+
   def feed
     following_ids = current_user.sent_follow_requests.where(status: "accepted").pluck(:recipient_id)
     @feed_photos = Photo.where(owner_id: following_ids)
