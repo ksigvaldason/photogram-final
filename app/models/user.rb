@@ -29,4 +29,16 @@ class User < ApplicationRecord
   has_many :likes, foreign_key: :fan_id
   has_many :sent_follow_requests, class_name: "FollowRequest", foreign_key: :sender_id
   has_many :received_follow_requests, class_name: "FollowRequest", foreign_key: :recipient_id
+  
+  def followers
+    User.where(id: received_follow_requests.where(status: "accepted").pluck(:sender_id))
+  end
+
+  def to_param  
+    username
+  end
+  
+  def following
+    User.where(id: sent_follow_requests.where(status: "accepted").pluck(:recipient_id))
+  end
 end

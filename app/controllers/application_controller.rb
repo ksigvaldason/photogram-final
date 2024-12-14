@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
   def authenticate_user!
     unless current_user
       redirect_to new_user_session_path, alert: "You need to sign in or sign up before continuing."
-      return
     end
   end  
   
@@ -17,5 +16,10 @@ class ApplicationController < ActionController::Base
   
   def after_sign_out_path_for(user)
     photos_path
+  end
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:username, :private])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:username, :private])
   end
 end

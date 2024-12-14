@@ -1,0 +1,55 @@
+<h1><%= @user.username %></h1>
+
+<dl>
+  <dt>Private</dt>
+  <dd><%= @user.private ? "Yes" : "No" %></dd>
+  <dt>Followers</dt>
+  <dd><%= @user.followers&.count || 0 %></dd>
+  <dt>Following</dt>
+  <dd><%= @user.following&.count || 0 %></dd>
+</dl>
+
+<% if @user.private? && @pending_requests.any? %>
+  <h4>Pending follow requests</h4>
+  <ul>
+    <% @pending_requests.each do |request| %>
+      <li>
+        <%= request.sender.username %>
+        <%= button_to "Accept", modify_follow_request_path(request, query_status: "accepted"), method: :post %>
+        <%= button_to "Reject", modify_follow_request_path(request, query_status: "rejected"), method: :post %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<nav>
+  <ul>
+    <li><%= link_to "Profile", user_path(@user) %></li>
+    <li><%= link_to "Liked photos", liked_photos_user_path(@user) %></li>
+    <li><%= link_to "Feed", feed_user_path(@user) %></li>
+    <li><%= link_to "Discover", discover_user_path(@user) %></li>
+  </ul>
+</nav>
+
+<h2>Own photos (<%= @user.photos.count %>)</h2>
+
+<table border="1">
+  <tr>
+    <th>Image</th>
+    <th>Owner</th>
+    <th>Caption</th>
+    <th>Posted</th>
+    <th>Likes</th>
+    <th></th>
+  </tr>
+  <% @user.photos.each do |photo| %>
+    <tr>
+      <td><img src="<%= photo.image %>" class="img-responsive"></td>
+      <td><%= @user.username %></td>
+      <td><%= photo.caption %></td>
+      <td><%= time_ago_in_words(photo.created_at) %> ago</td>
+      <td><%= photo.likes.count %></td>
+      <td><%= link_to "Show details", photo_path(photo) %></td>
+    </tr>
+  <% end %>
+</table>

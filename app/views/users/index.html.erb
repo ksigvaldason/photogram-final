@@ -10,10 +10,10 @@
   <% @users.each do |user| %>
     <tr>
       <td><%= user.username %></td>
-      <td><%= user.private ? "Yes" : "No" %></td>
+      <td><%= user.private? ? "Yes" : "No" %></td>
       <td>
         <% if user_signed_in? && current_user != user %>
-          <% follow_request = current_user.sent_follow_requests.find_by(recipient: user) %>
+          <% follow_request = current_user.sent_follow_requests.find_by(recipient_id: user.id) %>
           <% if follow_request.nil? %>
             <%= button_to "Follow", follow_requests_path(recipient_id: user.id), method: :post %>
           <% elsif follow_request.status == "pending" %>
@@ -24,7 +24,7 @@
           <% end %>
         <% end %>
       </td>
-      <td><%= link_to "Show details", user_path(user) %></td>
+      <td><%= link_to "Show details", "/users/#{user.username}" %></td>
     </tr>
   <% end %>
 </table>
