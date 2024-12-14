@@ -2,14 +2,18 @@ class PhotosController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index]
 
   def index
-    @photos = Photo.all
+    @photos = Photo.joins(:owner).where(users: { private: [false, nil] })
   end
 
   def create
     @photo = current_user.photos.build(photo_params)
+    @photo.comments_count = 0
+    @photo.likes_count = 0
+    
     if @photo.save
       redirect_to photos_path, notice: "Photo added successfully!"
     else
+      @photos = Photo.joins(:owner).where(users: { private: [false, nil] })
       render :index
     end
   end
