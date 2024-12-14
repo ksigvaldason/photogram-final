@@ -13,18 +13,23 @@
       <td><%= user.private? ? "Yes" : "No" %></td>
       <td>
         <% if user_signed_in? && current_user != user %>
-          <% follow_request = current_user.sent_follow_requests.find_by(recipient_id: user.id) %>
+          <% follow_request = current_user.sent_follow_requests.find_by(recipient: user) %>
           <% if follow_request.nil? %>
-            <%= button_to "Follow", follow_requests_path(recipient_id: user.id), method: :post %>
+            <%= form_with(url: follow_requests_path, method: :post) do |f| %>
+              <%= f.hidden_field :recipient_id, value: user.id %>
+              <%= f.submit "Follow" %>
+            <% end %>
           <% elsif follow_request.status == "pending" %>
             <span>Request sent</span>
-            <%= button_to "Cancel", follow_request_path(follow_request), method: :delete %>
+            <%= form_with(url: follow_request_path(follow_request), method: :delete) do |f| %>
+              <%= f.submit "Cancel" %>
+            <% end %>
           <% elsif follow_request.status == "accepted" %>
-            <%= button_to "Unfollow", follow_request_path(follow_request), method: :delete %>
+            <%= link_to "Unfollow", follow_request_path(follow_request), method: :delete %>
           <% end %>
         <% end %>
       </td>
-      <td><%= link_to "Show details", "/users/#{user.username}" %></td>
+      <td><%= link_to "Show details", user_path(user) %></td>
     </tr>
   <% end %>
 </table>
