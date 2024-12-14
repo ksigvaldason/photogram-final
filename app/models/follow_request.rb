@@ -12,4 +12,12 @@
 class FollowRequest < ApplicationRecord
   belongs_to :sender, class_name: "User"
   belongs_to :recipient, class_name: "User"
+  
+  before_create :set_status
+
+  private
+
+  def set_status
+    self.status = recipient.private? ? "pending" : "accepted"
+  end
 end

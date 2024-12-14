@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!
+  skip_before_action(:authenticate_user!, { :only => [:index] })
 
   def index
     @users = User.all
@@ -15,6 +15,11 @@ class UsersController < ApplicationController
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def show
+    @user = User.find(params[:id])
+    @pending_requests = @user.received_follow_requests.where(status: "pending") if @user.private?
   end
 
   private
