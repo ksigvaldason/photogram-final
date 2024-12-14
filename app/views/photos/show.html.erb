@@ -3,7 +3,7 @@
 <dl>
   <dt>Image</dt>
   <dd>
-    <img src="https://robohash.org/<%= @photo.image %>">
+    <img src="https://robohash.org/<%= @photo.image.split('/').last if @photo.image %>">
   </dd>
 
   <dt>Caption</dt>
@@ -16,10 +16,10 @@
   <dd><%= time_ago_in_words(@photo.created_at) %> ago</dd>
 
   <dt>Likes count</dt>
-  <dd><%= @photo.likes.count %></dd>
+  <dd><%= @photo.likes_count || @photo.likes.count %></dd>
 
   <dt>Comments count</dt>
-  <dd><%= @photo.comments.count %></dd>
+  <dd><%= @photo.comments_count || @photo.comments.count %></dd>
 
   <dt>Fans</dt>
   <dd>
@@ -30,33 +30,33 @@
   <dd>
     <% if user_signed_in? %>
       <% if current_user.likes.exists?(photo: @photo) %>
-        <%= button_to "Unlike", photo_like_path(@photo, current_user.likes.find_by(photo: @photo)), method: :delete %>
+        <%= link_to "Unlike", photo_like_path(@photo, current_user.likes.find_by(photo: @photo)), method: :delete %>
       <% else %>
-        <%= button_to "Like", photo_likes_path(@photo), method: :post %>
+        <%= form_with(url: photo_likes_path(@photo), method: :post) do |f| %>
+          <%= f.button "Like" %>
+        <% end %>
       <% end %>
     <% end %>
   </dd>
 </dl>
 
 <% if user_signed_in? && current_user == @photo.owner %>
-  <div>
-    <%= button_to "Delete this photo", photo_path(@photo), method: :delete %>
+  <%= link_to "Delete this photo", photo_path(@photo), method: :delete, data: { confirm: "Are you sure?" } %>
+  
+  <h3>Update photo</h3>
+  <%= form_with(model: @photo, local: true) do |form| %>
+    <div>
+      <%= form.label :caption %>
+      <%= form.text_field :caption %>
+    </div>
     
-    <h3>Update photo</h3>
-    <%= form_with(model: @photo, local: true) do |form| %>
-      <div>
-        <%= form.label :caption %>
-        <%= form.text_field :caption %>
-      </div>
-      
-      <div>
-        <%= form.label :image %>
-        <%= form.text_field :image %>
-      </div>
-      
-      <%= form.submit "Update photo" %>
-    <% end %>
-  </div>
+    <div>
+      <%= form.label :image %>
+      <%= form.text_field :image %>
+    </div>
+    
+    <%= form.submit "Update photo" %>
+  <% end %>
 <% end %>
 
 <h2>Comments</h2>
@@ -79,11 +79,14 @@
 
 <% if user_signed_in? %>
   <h3>Add a new comment</h3>
-  <%= form_with(model: [@photo, Comment.new], local: true) do |form| %>
-    <%= form.label :body, "Comment" %>
-    <%= form.text_area :body, placeholder: "Enter a comment..." %>
+  <%= form_with(url: photo_comments_path(@photo), method: :post) do |form| %>
+    <%= form.hidden_field :photo_id, value: @photo.id %>
     
-    <%= form.submit "Add comment" %>
+    <div>
+      <%= form.label :body, "Comment" %>
+      <%= form.text_area :body, placeholder: "Enter a comment..." %>
+    </div>
+    
+    <%= form.button "Add comment" %>
   <% end %>
 <% end %>
-
