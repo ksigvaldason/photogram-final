@@ -1,20 +1,16 @@
 class PhotosController < ApplicationController
-  skip_before_action(:authenticate_user!, { :only => [:index] })
+  skip_before_action :authenticate_user!, only: [:index]
 
   def index
     @photos = Photo.all
   end
 
   def create
-    @photo = Photo.new(photo_params)
-    @photo.owner_id = current_user.id
-    @photo.comments_count = 0
-    @photo.likes_count = 0
-
+    @photo = current_user.photos.build(photo_params)
     if @photo.save
-      redirect_to photos_path, notice: "Photo created successfully."
+      redirect_to photos_path, notice: "Photo added successfully!"
     else
-      redirect_to photos_path, alert: "Photo could not be created."
+      render :index
     end
   end
 

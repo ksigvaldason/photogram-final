@@ -1,22 +1,17 @@
 class LikesController < ApplicationController
-  before_action :authenticate_user!
-
   def create
-    @like = Like.new(
-      fan_id: current_user.id,
-      photo_id: params[:photo_id]
-    )
-
+    @photo = Photo.find(params[:photo_id])
+    @like = current_user.likes.build(photo: @photo)
     if @like.save
-      redirect_back(fallback_location: root_path, notice: "Photo liked successfully.")
+      redirect_to photos_path, notice: "Photo liked successfully!"
     else
-      redirect_back(fallback_location: root_path, alert: "Could not like photo.")
+      redirect_to photos_path, alert: 'Error liking photo.'
     end
   end
 
   def destroy
-    @like = Like.find(params[:id])
+    @like = current_user.likes.find(params[:id])
     @like.destroy
-    redirect_back(fallback_location: root_path, alert: "Photo unliked.")
+    redirect_to photos_path, notice: 'Photo unliked.'
   end
 end

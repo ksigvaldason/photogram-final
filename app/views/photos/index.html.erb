@@ -1,12 +1,45 @@
 <h1>Welcome to Photogram</h1>
 
 <% if @photos&.any? %>
-  <% @photos.each do |photo| %>
-    <div>
-      <img src="<%= photo.image %>" alt="<%= photo.caption %>">
-      <p><%= photo.caption %></p>
-    </div>
-  <% end %>
+  <div class="photo-gallery">
+    <% @photos.each do |photo| %>
+      <div class="photo-card">
+        <%= link_to photo_path(photo) do %>
+          <img src="<%= photo.image %>" alt="<%= photo.caption %>">
+        <% end %>
+        <div class="photo-details">
+          <p><%= photo.caption %></p>
+          <div class="photo-actions">
+            <% if user_signed_in? %>
+              <% if current_user.likes.exists?(photo: photo) %>
+                <%= link_to "Unlike", photo_like_path(photo, current_user.likes.find_by(photo: photo)), method: :delete %>
+              <% else %>
+                <%= button_to "Like", photo_likes_path(photo), method: :post %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
 <% else %>
   <p>No photos available yet.</p>
+<% end %>
+
+<% if user_signed_in? %>
+  <div id="new_photo_form">
+    <%= form_with(model: Photo.new, local: true) do |form| %>
+      <div class="field">
+        <%= form.label :caption %>
+        <%= form.text_field :caption %>
+      </div>
+      
+      <div class="field">
+        <%= form.label :image %>
+        <%= form.file_field :image %>
+      </div>
+      
+      <%= form.submit "Add Photo" %>
+    <% end %>
+  </div>
 <% end %>

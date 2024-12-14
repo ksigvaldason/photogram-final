@@ -1,13 +1,11 @@
 Rails.application.routes.draw do
   devise_for :users
-  
-  # Root route
   root "photos#index"
   
-  # Resource routes
   resources :users, only: [:index, :show, :edit, :update]
-  resources :photos
+  resources :photos do
+    resources :likes, only: [:create, :destroy]
+  end
   resources :comments
-  resources :likes
-  resources :follow_requests
+  resources :follow_requests, only: [:create, :destroy]
 end
